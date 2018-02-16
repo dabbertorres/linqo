@@ -1,5 +1,8 @@
 # linqo
 
+[![Coverage Status](https://coveralls.io/repos/github/dabbertorres/linqo/badge.svg?branch=master)](https://coveralls.io/github/dabbertorres/linqo?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/dabbertorres/linqo)](https://goreportcard.com/report/github.com/dabbertorres/linqo)
+
 I've always thought .NET's LINQ is a pretty nice tool for analyzing data sets - and the LINQ to SQL tool makes it even more useful.
 
 [go-linq](https://github.com/ahmetb/go-linq) is a great library, however, it doesn't support translating to SQL (and isn't the project's goal).
