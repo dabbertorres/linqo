@@ -1,5 +1,6 @@
 # linqo
 
+[![Build Status](https://travis-ci.org/dabbertorres/linqo.svg?branch=master)](https://travis-ci.org/dabbertorres/linqo)
 [![Coverage Status](https://coveralls.io/repos/github/dabbertorres/linqo/badge.svg?branch=master)](https://coveralls.io/github/dabbertorres/linqo?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/dabbertorres/linqo)](https://goreportcard.com/report/github.com/dabbertorres/linqo)
 
