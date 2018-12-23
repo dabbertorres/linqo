@@ -2,56 +2,69 @@ package linqo
 
 import (
 	"bytes"
-	"fmt"
+)
+
+type CreateOption string
+
+const (
+	IfNotExists CreateOption = "IF NOT EXISTS"
 )
 
 type CommitOption string
 
 const (
-	OnCommitDelete   CommitOption = "DELETE"
-	OnCommitPreserve CommitOption = "PRESERVE"
+	OnCommitDelete   CommitOption = "DELETE ROWS"
+	OnCommitDrop     CommitOption = "DROP"
+	OnCommitPreserve CommitOption = "PRESERVE ROWS"
 )
 
-type CreateTempOption string
-
-const (
-	CreateTempGlobal CreateTempOption = "GLOBAL"
-	CreateTempLocal  CreateTempOption = "LOCAL"
-)
-
-type CreateOptions interface {
+type CommitOptions interface {
 	Action
 	OnCommit(option CommitOption) Action
 }
 
 type CreateColumns interface {
-	Columns(columns ...ColumnDef) CreateOptions
+	Columns(columns ...ColumnDef) CommitOptions
 }
 
 type createBuilder struct {
 	*bytes.Buffer
 }
 
-func Create(table string) CreateColumns {
+func Create(table string, options ... CreateOption) CreateColumns {
 	c := createBuilder{bytes.NewBuffer(nil)}
-	fmt.Fprint(c, "CREATE TABLE ", table)
+	c.WriteString("CREATE TABLE ")
+	for _, o := range options {
+		c.WriteString(string(o))
+		c.WriteByte(' ')
+	}
+	c.WriteString(table)
+	c.WriteByte(' ')
 	return c
 }
 
-func CreateTemporary(table string, opt CreateTempOption) CreateColumns {
+func CreateTemporary(table string, options ... CreateOption) CreateColumns {
 	c := createBuilder{bytes.NewBuffer(nil)}
-	fmt.Fprint(c, "CREATE ", opt, " TEMPORARY TABLE ", table)
+	c.WriteString("CREATE TEMPORARY TABLE ")
+	for _, o := range options {
+		c.WriteString(string(o))
+		c.WriteByte(' ')
+	}
+	c.WriteString(table)
+	c.WriteByte(' ')
 	return c
 }
 
-func (b createBuilder) Columns(columns ...ColumnDef) CreateOptions {
-	fmt.Fprint(b, " (")
+func (b createBuilder) Columns(columns ...ColumnDef) CommitOptions {
 	cols := make([]string, len(columns))
 	for i, col := range columns {
 		cols[i] = col.String()
 	}
+
+	b.WriteByte('(')
 	writeCommaSepList(b, cols...)
-	fmt.Fprint(b, ")")
+	b.WriteByte(')')
+
 	return b
 }
 
@@ -59,10 +72,12 @@ func (b createBuilder) Columns(columns ...ColumnDef) CreateOptions {
 // in that same vein, a "sql" field tag would be an interesting idea
 
 func (b createBuilder) OnCommit(option CommitOption) Action {
-	fmt.Fprint(b, " ON COMMIT ", option, " ROWS")
+	b.WriteString(" ON COMMIT ")
+	b.WriteString(string(option))
 	return b
 }
 
 func (b createBuilder) String() string {
-	return b.Buffer.String() + ";"
+	b.WriteByte(';')
+	return b.Buffer.String()
 }

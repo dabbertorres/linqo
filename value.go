@@ -2,7 +2,7 @@ package linqo
 
 import "fmt"
 
-// Variable simply stands for a placeholder
+// Variable represents a SQL placeholder
 type Variable struct{}
 
 type Value interface{}

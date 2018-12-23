@@ -20,9 +20,9 @@ func TestCreate(t *testing.T) {
 }
 
 func TestCreateTemporary(t *testing.T) {
-	const expected = `CREATE GLOBAL TEMPORARY TABLE customers (firstName varchar(255),lastName varchar(255),totalSpending decimal);`
+	const expected = `CREATE TEMPORARY TABLE customers (firstName varchar(255),lastName varchar(255),totalSpending decimal);`
 
-	stmt := CreateTemporary("customers", CreateTempGlobal).
+	stmt := CreateTemporary("customers").
 		Columns(
 			Column("firstName", "varchar(255)"),
 			Column("lastName", "varchar(255)"),

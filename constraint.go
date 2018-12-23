@@ -2,7 +2,6 @@ package linqo
 
 import (
 	"bytes"
-	"fmt"
 )
 
 type Constraint interface {
@@ -80,25 +79,30 @@ func ConstraintPrimaryKey() Constraint {
 func ConstraintReferences(table string, columns ...string) ReferencesConstraint {
 	c := constraintReferences{bytes.NewBuffer(nil)}
 
-	fmt.Fprintf(c, "REFERENCES %s(", table)
+	c.WriteString("REFERENCES ")
+	c.WriteString(table)
+	c.WriteString(" (")
 	writeCommaSepList(c, columns...)
-	fmt.Fprint(c, ")")
+	c.WriteByte(')')
 
 	return c
 }
 
 func (c constraintReferences) Match(m ConstraintMatch) ReferencesConstraintMatch {
-	fmt.Fprint(c, " MATCH ", m)
+	c.WriteString(" MATCH ")
+	c.WriteString(string(m))
 	return c
 }
 
 func (c constraintReferences) OnUpdate(a ReferentialAction) ReferencesConstraintOnUpdate {
-	fmt.Fprint(c, " ON UPDATE ", a)
+	c.WriteString(" ON UPDATE ")
+	c.WriteString(string(a))
 	return c
 }
 
 func (c constraintReferences) OnDelete(a ReferentialAction) Constraint {
-	fmt.Fprint(c, " ON DELETE ", a)
+	c.WriteString(" ON DELETE ")
+	c.WriteString(string(a))
 	return c
 }
 

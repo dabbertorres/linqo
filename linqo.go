@@ -1,8 +1,6 @@
 package linqo
 
-import "fmt"
-
 type Action interface {
-	fmt.Stringer
+	String() string
 	//PrettyPrint() string
 }

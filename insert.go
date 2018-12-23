@@ -2,7 +2,6 @@ package linqo
 
 import (
 	"bytes"
-	"fmt"
 )
 
 type InsertValues interface {
@@ -20,14 +19,15 @@ type insertBuilder struct {
 
 func Insert(table string) InsertPrelude {
 	b := insertBuilder{bytes.NewBuffer(nil)}
-	fmt.Fprint(b, "INSERT INTO ", table)
+	b.WriteString("INSERT INTO ")
+	b.WriteString(table)
 	return b
 }
 
 func (b insertBuilder) Columns(columns ...string) InsertValues {
-	fmt.Fprint(b, " (")
+	b.WriteString(" (")
 	writeCommaSepList(b, columns...)
-	fmt.Fprint(b, ")")
+	b.WriteByte(')')
 	return b
 }
 
@@ -40,16 +40,16 @@ func (b insertBuilder) Values(rows ...ValuesList) Action {
 		}
 	}
 
-	fmt.Fprint(b, " VALUES (")
+	b.WriteString(" VALUES (")
 	writeCommaSepList(b, rowStrs[0]...)
-	fmt.Fprint(b, ")")
+	b.WriteByte(')')
 
 	for _, r := range rowStrs[1:] {
-		fmt.Fprint(b, ",(")
+		b.WriteString(",(")
 		writeCommaSepList(b, r...)
-		fmt.Fprint(b, ")")
+		b.WriteByte(')')
 	}
 
-	fmt.Fprint(b, ";")
+	b.WriteByte(';')
 	return b
 }

@@ -2,7 +2,6 @@ package linqo
 
 import (
 	"bytes"
-	"fmt"
 )
 
 type DeleteBuilder interface {
@@ -18,21 +17,25 @@ type deletePositioned string
 
 func Delete(table string) DeleteBuilder {
 	d := deleteBuilder{bytes.NewBuffer(nil)}
-	fmt.Fprint(d, "DELETE FROM ", table)
+	d.WriteString("DELETE FROM ")
+	d.WriteString(table)
 	return d
 }
 
 func DeletePositioned(table, cursor string) Action {
-	return deletePositioned(fmt.Sprintf("DELETE FROM %s WHERE CURRENT OF %s;", table, cursor))
+	str := "DELETE FROM " + table + " WHERE CURRENT OF " + cursor + ";"
+	return deletePositioned(str)
 }
 
 func (d deleteBuilder) Where(term SearchTerm) Action {
-	fmt.Fprint(d, " WHERE ", term)
+	d.WriteString(" WHERE ")
+	d.WriteString(string(term))
 	return d
 }
 
 func (d deleteBuilder) String() string {
-	return d.Buffer.String() + ";"
+	d.Buffer.WriteByte(';')
+	return d.Buffer.String()
 }
 
 func (d deletePositioned) String() string {

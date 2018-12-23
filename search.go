@@ -2,111 +2,114 @@ package linqo
 
 import (
 	"bytes"
-	"fmt"
 )
 
 type SearchTerm string
 
-func (t SearchTerm) String() string {
-	return string(t)
-}
-
 func Or(left, right SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s OR %s)", left, right))
+	return SearchTerm("(" + left + " OR " + right + ")")
 }
 
 func And(left, right SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s AND %s)", left, right))
+	return SearchTerm("(" + left + " AND " + right + ")")
 }
 
 func Not(term SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(NOT %s)", term))
+	return SearchTerm("(NOT " + term + ")")
 }
 
 func IsUnknown(term SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s IS UNKNOWN)", term))
+	return SearchTerm("(" + term + " IS UNKNOWN)")
 }
 
 func Equals(left, right SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s = %s)", left, right))
+	return SearchTerm("(" + left + " = " + right + ")")
 }
 
 func NotEquals(left, right SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s <> %s)", left, right))
+	return SearchTerm("(" + left + " <> " + right + ")")
 }
 
 func LessThan(left, right SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s < %s)", left, right))
+	return SearchTerm("(" + left + " < " + right + ")")
 }
 
 func GreaterThan(left, right SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s > %s)", left, right))
+	return SearchTerm("(" + left + " > " + right + ")")
 }
 
 func LessOrEqual(left, right SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s <= %s)", left, right))
+	return SearchTerm("(" + left + " <= " + right + ")")
 }
 
 func GreaterOrEqual(left, right SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s >= %s)", left, right))
+	return SearchTerm("(" + left + " >= " + right + ")")
 }
 
 func Between(value, lowerBound, upperBound SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s BETWEEN %s AND %s)", value, lowerBound, upperBound))
+	return SearchTerm("(" + value + " BETWEEN " + lowerBound + " AND " + upperBound + ")")
 }
 
 func NotBetween(value, lowerBound, upperBound SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s NOT BETWEEN %s AND %s)", value, lowerBound, upperBound))
+	return SearchTerm("(" + value + " NOT BETWEEN " + lowerBound + " AND " + upperBound + ")")
 }
 
 func In(value SearchTerm, list ...string) SearchTerm {
-	listBuf := bytes.NewBuffer(nil)
-	writeCommaSepList(listBuf, list...)
-	return SearchTerm(fmt.Sprintf("(%s IN (%s))", value, listBuf.String()))
+	buf := bytes.NewBuffer(nil)
+	buf.WriteByte('(')
+	buf.WriteString(string(value))
+	buf.WriteString(" IN (")
+	writeCommaSepList(buf, list...)
+	buf.WriteString("))")
+	return SearchTerm(buf.String())
 }
 
 func NotIn(value SearchTerm, list ...string) SearchTerm {
-	listBuf := bytes.NewBuffer(nil)
-	writeCommaSepList(listBuf, list...)
-	return SearchTerm(fmt.Sprintf("(%s NOT IN (%s))", value, listBuf.String()))
+	buf := bytes.NewBuffer(nil)
+	buf.WriteByte('(')
+	buf.WriteString(string(value))
+	buf.WriteString(" NOT IN (")
+	writeCommaSepList(buf, list...)
+	buf.WriteString("))")
+	return SearchTerm(buf.String())
 }
 
 func Like(value, pattern string) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s LIKE %s)", value, pattern))
+	return SearchTerm("(" + value + " LIKE " + pattern + ")")
 }
 
 func NotLike(value, pattern string) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s NOT LIKE %s)", value, pattern))
+	return SearchTerm("(" + value + " NOT LIKE " + pattern + ")")
 }
 
 func LikeEscaped(value, pattern, escape string) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s LIKE %s ESCAPE %s)", value, pattern, escape))
+	return SearchTerm("(" + value + " LIKE " + pattern + " ESCAPE " + escape + ")")
 }
 
 func NotLikeEscaped(value, pattern, escape string) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s NOT LIKE %s ESCAPE %s)", value, pattern, escape))
+	return SearchTerm("(" + value + " NOT LIKE " + pattern + " ESCAPE " + escape + ")")
 }
 
 func IsNull(value SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s IS NULL)", value))
+	return SearchTerm("(" + value + " IS NULL)")
 }
 
 func IsNotNull(value SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s IS NOT NULL)", value))
+	return SearchTerm("(" + value + " IS NOT NULL)")
 }
 
 // TODO QuantifiedComparison
 
 func Exists(query SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(EXISTS %s)", query))
+	return SearchTerm("(EXISTS " + query + ")")
 }
 
 func Unique(query SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(UNIQUE %s)", query))
+	return SearchTerm("(UNIQUE " + query + ")")
 }
 
 // TODO func Match(value, query SearchTerm) SearchTerm
 
 func Overlaps(value1, value2 SearchTerm) SearchTerm {
-	return SearchTerm(fmt.Sprintf("(%s OVERLAPS %s)", value1, value2))
+	return SearchTerm("(" + value1 + " OVERLAPS " + value2 + ")")
 }

@@ -2,7 +2,6 @@ package linqo
 
 import (
 	"bytes"
-	"fmt"
 )
 
 type SelectTermWhere interface {
@@ -57,10 +56,10 @@ type selectBuilder struct {
 
 func Select(what ...string) SelectPrelude {
 	b := selectBuilder{bytes.NewBuffer(nil)}
-	fmt.Fprint(b, "SELECT ")
+	b.WriteString("SELECT ")
 
 	if len(what) == 0 {
-		fmt.Fprint(b, "*")
+		b.WriteByte('*')
 	} else {
 		writeCommaSepList(b, what...)
 	}
@@ -70,10 +69,10 @@ func Select(what ...string) SelectPrelude {
 
 func SelectDistinct(what ...string) SelectPrelude {
 	b := selectBuilder{bytes.NewBuffer(nil)}
-	fmt.Fprint(b, "SELECT DISTINCT ")
+	b.WriteString("SELECT DISTINCT ")
 
 	if len(what) == 0 {
-		fmt.Fprint(b, "*")
+		b.WriteByte('*')
 	} else {
 		writeCommaSepList(b, what...)
 	}
@@ -82,29 +81,31 @@ func SelectDistinct(what ...string) SelectPrelude {
 }
 
 func (b selectBuilder) From(tables ...string) SelectOptions {
-	fmt.Fprint(b, " FROM ")
+	b.WriteString(" FROM ")
 	writeCommaSepList(b, tables...)
 	return b
 }
 
 func (b selectBuilder) Where(term SearchTerm) SelectWhere {
-	fmt.Fprint(b, " WHERE ", term)
+	b.WriteString(" WHERE ")
+	b.WriteString(string(term))
 	return b
 }
 
 func (b selectBuilder) GroupBy(columns ...string) SelectGroupBy {
-	fmt.Fprint(b, " GROUP BY ")
+	b.WriteString(" GROUP BY ")
 	writeCommaSepList(b, columns...)
 	return b
 }
 
 func (b selectBuilder) Having(term SearchTerm) SelectHaving {
-	fmt.Fprint(b, " HAVING ", term)
+	b.WriteString(" HAVING ")
+	b.WriteString(string(term))
 	return b
 }
 
 func (b selectBuilder) OrderBy(sortingSpecs ...SortSpec) Action {
-	fmt.Fprint(b, " ORDER BY ")
+	b.WriteString(" ORDER BY ")
 
 	specs := make([]string, len(sortingSpecs))
 	for i, spec := range sortingSpecs {

@@ -1,7 +1,5 @@
 package linqo
 
-import "fmt"
-
 type OrderingSpec string
 
 const (
@@ -17,8 +15,8 @@ type SortSpec struct {
 
 func (ss SortSpec) String() string {
 	if ss.Collate != "" {
-		return fmt.Sprintf("%s COLLATE %s %s", ss.Key, ss.Collate, ss.Order)
+		return ss.Key + " COLLATE " + ss.Collate + " " + string(ss.Order)
 	} else {
-		return fmt.Sprintf("%s %s", ss.Key, ss.Order)
+		return ss.Key + " " + string(ss.Order)
 	}
 }

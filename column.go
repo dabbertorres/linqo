@@ -2,11 +2,10 @@ package linqo
 
 import (
 	"bytes"
-	"fmt"
 )
 
 type ColumnDef interface {
-	fmt.Stringer
+	String() string
 }
 
 type ColumnAttributeDefault interface {
@@ -45,23 +44,28 @@ type column struct {
 
 func Column(name, dataType string) ColumnAttributes {
 	c := column{bytes.NewBuffer(nil)}
-	fmt.Fprint(c, name, " ", dataType)
+	c.WriteString(name)
+	c.WriteByte(' ')
+	c.WriteString(dataType)
 	return c
 }
 
 func (c column) Default(v Value) ColumnDefault {
-	fmt.Fprint(c, " DEFAULT ", stringifyValue(v))
+	c.WriteString(" DEFAULT ")
+	c.WriteString(stringifyValue(v))
 	return c
 }
 
 func (c column) Constraints(cts ...Constraint) ColumnConstraints {
 	for _, ct := range cts {
-		fmt.Fprint(c, " ", ct)
+		c.WriteByte(' ')
+		c.WriteString(ct.String())
 	}
 	return c
 }
 
 func (c column) Collate(name string) ColumnDef {
-	fmt.Fprint(c, " COLLATE ", name)
+	c.WriteString(" COLLATE ")
+	c.WriteString(name)
 	return c
 }
